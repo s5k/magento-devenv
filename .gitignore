@@ -1,0 +1,4 @@
+.env
+.devenv.flake.nix
+/magento2/
+.devenv/
