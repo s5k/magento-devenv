@@ -40,7 +40,7 @@
   services.caddy.enable = true;
   services.caddy.virtualHosts."http://${config.env.DEV_DOMAIN}:80" = {
     extraConfig = ''
-      root * magenos2/pub
+      root * ${config.env.MAGENTO_DIR}/pub
       php_fastcgi unix/${config.languages.php.fpm.pools.web.socket}
       file_server
 
