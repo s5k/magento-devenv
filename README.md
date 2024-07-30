@@ -32,7 +32,7 @@ This branch is only compatible with Magento 2.4.6 because of the need for OpenSe
 5. `cd [Magento Folder]`
 6. `composer install`
 7. Install sample data if you want
-8. `bin/magento setup:install --base-url='http://magento2.test' --db-host='127.0.0.1' --db-user='magento2' --db-password='magento2' --db-name='magento2' --admin-firstname='admin' --admin-lastname='admin' --admin-email='admin@admin.com' --admin-user='admin' --admin-password='admin123' --language='en_US' --currency='EUR' --timezone='Europe/Rome' --use-rewrites='1' --backend-frontname='admin' --session-save-redis-host='127.0.0.1' --session-save-redis-port='6379' --session-save-redis-db='0' --cache-backend-redis-server='127.0.0.1' --cache-backend-redis-port='6379' --cache-backend-redis-db='1' --page-cache-redis-server='127.0.0.1' --page-cache-redis-port='6379' --page-cache-redis-db='2' --opensearch-host='127.0.0.1' --opensearch-port='9200'`
+8. `bin/magento setup:install --base-url='http://magento2.test' --db-host='127.0.0.1' --db-user='magento2' --db-password='magento2' --db-name='magento2' --admin-firstname='admin' --admin-lastname='admin' --admin-email='admin@admin.com' --admin-user='admin' --admin-password='admin123' --language='en_US' --currency='EUR' --timezone='Europe/Rome' --use-rewrites='1' --backend-frontname='admin' --session-save=redis --session-save-redis-host='127.0.0.1' --session-save-redis-port='6379' --session-save-redis-db='0' --cache-backend-redis-server='127.0.0.1' --cache-backend-redis-port='6379' --cache-backend-redis-db='1' --page-cache-redis-server='127.0.0.1' --page-cache-redis-port='6379' --page-cache-redis-db='2' --opensearch-host='127.0.0.1' --opensearch-port='9200'`
 
 ## For existing Magento 2 project
 
