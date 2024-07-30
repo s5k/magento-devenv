@@ -1,6 +1,11 @@
 { pkgs, lib, config, ... }:
+let
+  DOMAIN = "magento2.local";
+  MAGENTO_DIR = "magento2";
+in
 {
-  dotenv.enable = true;
+  dotenv.disableHint = true;
+
   packages = [ pkgs.git pkgs.gnupatch pkgs.n98-magerun2 ];
 
   languages.php.enable = true;
@@ -52,11 +57,17 @@
   services.redis.enable = true;
   services.redis.port = 6379;
 
+  # Auto generete cert SSL for domain
+  certificates = [ DOMAIN ];
+
+  # Add domain to /etc/hosts
+  hosts."${DOMAIN}" = "127.0.0.1";
+
   services.caddy.enable = true;
-  services.caddy.virtualHosts."http://${config.env.DEV_DOMAIN}:80" = {
+  services.caddy.virtualHosts."${DOMAIN}" = {
     extraConfig = ''
       encode zstd gzip
-      root * ${config.env.MAGENTO_DIR}/pub
+      root * ${MAGENTO_DIR}/pub
       php_fastcgi unix/${config.languages.php.fpm.pools.web.socket}
       file_server
       encode
@@ -104,6 +115,6 @@
   ];
 
   processes = {
-    cronjob.exec = ''while true; do php ${config.env.MAGENTO_DIR}/bin/magento cron:run && sleep 60; done'';
+    cronjob.exec = ''while true; do php ${MAGENTO_DIR}/bin/magento cron:run && sleep 60; done'';
   };
 }
