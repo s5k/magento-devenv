@@ -7,9 +7,24 @@
   languages.php.package = pkgs.php82.buildEnv {
     extensions = { all, enabled }: with all; enabled ++ [ xdebug xsl redis ];
     extraConfig = ''
-      memory_limit = 512m
+      memory_limit = 2G
+      realpath_cache_ttl = 3600
+      session.gc_probability = 0
+      ${lib.optionalString config.services.redis.enable ''
+      session.save_handler = redis
+      session.save_path = "tcp://127.0.0.1:${toString config.services.redis.port}/0"
+      ''}
+      display_errors = On
+      error_reporting = E_ALL
+      assert.active = 0
       opcache.memory_consumption = 256M
       opcache.interned_strings_buffer = 20
+      zend.assertions = 0
+      short_open_tag = 0
+      zend.detect_unicode = 0
+      post_max_size = 32M
+      upload_max_filesize = 32M
+
       xdebug.mode = "debug"
       xdebug.start_with_request = "trigger"
       xdebug.discover_client_host = 1
@@ -23,10 +38,10 @@
     settings = {
       "clear_env" = "no";
       "pm" = "dynamic";
-      "pm.max_children" = 5;
+      "pm.max_children" = 10;
       "pm.start_servers" = 2;
       "pm.min_spare_servers" = 1;
-      "pm.max_spare_servers" = 5;
+      "pm.max_spare_servers" = 10;
     };
   };
 
@@ -40,9 +55,11 @@
   services.caddy.enable = true;
   services.caddy.virtualHosts."http://${config.env.DEV_DOMAIN}:80" = {
     extraConfig = ''
+      encode zstd gzip
       root * ${config.env.MAGENTO_DIR}/pub
       php_fastcgi unix/${config.languages.php.fpm.pools.web.socket}
       file_server
+      encode
 
       @blocked {
         path /media/customer/* /media/downloadable/* /media/import/* /media/custom_options/* /errors/*
@@ -69,6 +86,8 @@
         @dynamic not file /media/{re.reg_media.1}
         rewrite @dynamic /get.php?resource={re.reg_media.1}
       }
+
+      encode zstd gzip
     '';
   };
 
