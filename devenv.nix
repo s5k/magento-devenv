@@ -5,7 +5,6 @@ let
 in
 {
   dotenv.disableHint = true;
-
   packages = [ pkgs.git pkgs.gnupatch pkgs.n98-magerun2 ];
 
   languages.php.enable = true;
@@ -39,12 +38,18 @@ in
 
     '';
   };
+  languages.php.fpm.settings = {
+    error_log = config.env.DEVENV_STATE + "/php-fpm/php-fpm.log";
+    "emergency_restart_threshold" = 5;
+    "emergency_restart_interval" = "1m";
+    "process_control_timeout" = "10s";
+  };
   languages.php.fpm.pools.web = {
     settings = {
       "clear_env" = "no";
       "pm" = "dynamic";
-      "pm.max_children" = 10;
-      "pm.start_servers" = 2;
+      "pm.max_children" = 20;
+      "pm.start_servers" = 6;
       "pm.min_spare_servers" = 1;
       "pm.max_spare_servers" = 10;
     };
@@ -64,11 +69,14 @@ in
   hosts."${DOMAIN}" = "127.0.0.1";
 
   services.caddy.enable = true;
-  services.caddy.virtualHosts."${DOMAIN}" = {
+  # Remember always to add https://<domain>:<port> to the config, to avoid the redirect loop and delay.
+  services.caddy.virtualHosts."https://${DOMAIN}:443" = {
     extraConfig = ''
       encode zstd gzip
       root * ${MAGENTO_DIR}/pub
-      php_fastcgi unix/${config.languages.php.fpm.pools.web.socket}
+      php_fastcgi unix/${config.languages.php.fpm.pools.web.socket} {
+        trusted_proxies private_ranges
+      }
       file_server
       encode
 
